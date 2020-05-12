@@ -22,8 +22,8 @@ public class MainActivity extends AppCompatActivity implements CarsView {
     CarAdapter carAdapter;
     List<Data> cars;
     CarsPresenter presenter;
-    private boolean isScrolling=false;
-    private int page= 1;
+    private boolean isScrolling = false;
+    private int page = 1;
     private boolean loading = true;
 
 
@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements CarsView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
 
         carsRecyclerView = findViewById(R.id.recycler_cars);
@@ -56,27 +55,25 @@ public class MainActivity extends AppCompatActivity implements CarsView {
 
                 LinearLayoutManager mLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
-                if(dy > 0) //check for scroll down
-                {
-                    int visibleItemCount = mLayoutManager.getChildCount();
-                    int totalItemCount = mLayoutManager.getItemCount();
-                    int pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+                int visibleItemCount = mLayoutManager.getChildCount();
+                int totalItemCount = mLayoutManager.getItemCount();
+                int pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
 
-                    if (loading)
-                    {
-                        if ( (visibleItemCount + pastVisiblesItems) >= totalItemCount)
-                        {
-                            loading = false;
-                            presenter.getcars(page+1);
-                        }
+                if (isScrolling) {
+                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                        loading = false;
+                        isScrolling = false;
+                        page++;
+                        presenter.getcars(page);
                     }
                 }
+
 
             }
         });
 
 
-        presenter = new CarsPresenterImpl(this,new CarsInteractorImpl());
+        presenter = new CarsPresenterImpl(this, new CarsInteractorImpl());
         presenter.getcars(page);
     }
 

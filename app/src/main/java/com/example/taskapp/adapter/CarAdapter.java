@@ -40,7 +40,8 @@ public class CarAdapter extends RecyclerView.Adapter<CarHolder> {
     }
 
     public void setCars(List<Data> cars) {
-        this.cars = cars;
-        notifyDataSetChanged();
+        int startIndex = cars.size();
+        this.cars.addAll(cars);
+        notifyItemRangeInserted(startIndex,cars.size());
     }
 }
