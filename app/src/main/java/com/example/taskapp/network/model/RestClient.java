@@ -1,6 +1,7 @@
-package com.example.taskapp.network;
+package com.example.taskapp.network.model;
 
 
+import com.example.taskapp.network.MostPopularApi;
 import com.example.taskapp.utilities.Constant;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RestClient {
-    MockableApi mockableApi;
+    MostPopularApi mockableApi;
 
 
     public RestClient() {
@@ -37,11 +38,11 @@ public class RestClient {
                 .client(client.build())
                 .build();
 
-        mockableApi = retrofit.create(MockableApi.class);
+        mockableApi = retrofit.create(MostPopularApi.class);
     }
 
 
-    public MockableApi getApiService() {
+    public MostPopularApi getApiService() {
         return mockableApi;
     }
 }

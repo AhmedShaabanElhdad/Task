@@ -1,30 +1,34 @@
 package com.example.taskapp.activity;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActionBar;
+import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.widget.AbsListView;
+import android.os.Handler;
 import android.widget.Toast;
 
 import com.example.taskapp.R;
-import com.example.taskapp.adapter.CarAdapter;
-import com.example.taskapp.network.Data;
+import com.example.taskapp.activity.mvp.ArticlesInteractorImpl;
+import com.example.taskapp.activity.mvp.ArticlesPresenter;
+import com.example.taskapp.activity.mvp.ArticlesPresenterImpl;
+import com.example.taskapp.activity.mvp.ArticlesView;
+import com.example.taskapp.adapter.ArticlesAdapter;
+import com.example.taskapp.network.model.Results;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements CarsView {
+public class MainActivity extends AppCompatActivity implements ArticlesView {
 
     RecyclerView carsRecyclerView;
-    CarAdapter carAdapter;
-    List<Data> cars;
-    CarsPresenter presenter;
-    private boolean isScrolling = false;
-    private int page = 1;
+    ArticlesAdapter articlesAdapter;
+    List<Results> articles;
+    ArticlesPresenter presenter;
     private boolean loading = true;
+    private ProgressDialog progressDialog;
 
 
     @Override
@@ -32,60 +36,50 @@ public class MainActivity extends AppCompatActivity implements CarsView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initRecyclerView();
+        initView();
+        intiAndCallPresenter();
 
+    }
+
+    private void initView() {
+        progressDialog = new ProgressDialog(this);
+    }
+
+    private void intiAndCallPresenter() {
+        presenter = new ArticlesPresenterImpl(this, new ArticlesInteractorImpl());
+        presenter.getArticles();
+    }
+
+    private void initRecyclerView() {
         carsRecyclerView = findViewById(R.id.recycler_cars);
         carsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         carsRecyclerView.setHasFixedSize(true);
 
-        cars = new ArrayList<>();
-        carAdapter = new CarAdapter(cars, this);
+        articles = new ArrayList<>();
+        articlesAdapter = new ArticlesAdapter(articles, this);
 
-        carsRecyclerView.setAdapter(carAdapter);
-        carsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
-                    isScrolling = true;
-            }
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                LinearLayoutManager mLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-
-                int visibleItemCount = mLayoutManager.getChildCount();
-                int totalItemCount = mLayoutManager.getItemCount();
-                int pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
-
-                if (isScrolling) {
-                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
-                        loading = false;
-                        isScrolling = false;
-                        page++;
-                        presenter.getcars(page);
-                    }
-                }
-
-
-            }
-        });
-
-
-        presenter = new CarsPresenterImpl(this, new CarsInteractorImpl());
-        presenter.getcars(page);
+        carsRecyclerView.setAdapter(articlesAdapter);
     }
 
 
     @Override
     public void showProgress() {
 
+        if (!progressDialog.isShowing())
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.show();
+                }
+            }, 100);
     }
+
 
     @Override
     public void hideProgress() {
-
+        if (progressDialog.isShowing())
+            progressDialog.dismiss();
     }
 
     @Override
@@ -94,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements CarsView {
     }
 
     @Override
-    public void getCars(List<Data> cars) {
-        carAdapter.setCars(cars);
+    public void getArticles(List<Results> articles) {
+        articlesAdapter.setArticles(articles);
     }
 }
