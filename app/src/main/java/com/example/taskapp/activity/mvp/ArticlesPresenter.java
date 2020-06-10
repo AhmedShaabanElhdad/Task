@@ -4,7 +4,7 @@ public interface ArticlesPresenter {
 
     void onResume();
 
-    void getArticles();
+    void getArticles(String key);
 
     void onDestroy();
 

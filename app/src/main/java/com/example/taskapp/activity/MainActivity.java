@@ -17,6 +17,7 @@ import com.example.taskapp.activity.mvp.ArticlesPresenterImpl;
 import com.example.taskapp.activity.mvp.ArticlesView;
 import com.example.taskapp.adapter.ArticlesAdapter;
 import com.example.taskapp.network.model.Results;
+import com.example.taskapp.utilities.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements ArticlesView {
     ArticlesAdapter articlesAdapter;
     List<Results> articles;
     ArticlesPresenter presenter;
-    private boolean loading = true;
     private ProgressDialog progressDialog;
 
 
@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity implements ArticlesView {
     }
 
     private void intiAndCallPresenter() {
-        presenter = new ArticlesPresenterImpl(this, new ArticlesInteractorImpl());
-        presenter.getArticles();
+        presenter = new ArticlesPresenterImpl(this);
+        presenter.getArticles(Constant.API_KEY);
     }
 
     private void initRecyclerView() {
@@ -90,5 +90,12 @@ public class MainActivity extends AppCompatActivity implements ArticlesView {
     @Override
     public void getArticles(List<Results> articles) {
         articlesAdapter.setArticles(articles);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 }

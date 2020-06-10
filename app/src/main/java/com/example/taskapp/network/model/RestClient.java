@@ -3,6 +3,7 @@ package com.example.taskapp.network.model;
 
 import com.example.taskapp.network.MostPopularApi;
 import com.example.taskapp.utilities.Constant;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.IOException;
 
@@ -35,6 +36,7 @@ public class RestClient {
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(Constant.DOMAIN)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(client.build())
                 .build();
 

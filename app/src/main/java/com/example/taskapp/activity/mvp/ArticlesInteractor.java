@@ -1,20 +1,14 @@
 package com.example.taskapp.activity.mvp;
 
+import com.example.taskapp.network.model.Response;
 import com.example.taskapp.network.model.Results;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+
 public interface ArticlesInteractor {
 
-
-    interface OnFinishedListener {
-
-        void onFinished(List<Results> articles);
-
-        void onError(String msg);
-    }
-
-
-    void getMostPopular(OnFinishedListener listener);
+    Observable<Response> getMostPopular(String key);
 
 }

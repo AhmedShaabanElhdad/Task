@@ -1,37 +1,53 @@
 package com.example.taskapp.activity.mvp;
 
-import android.util.Log;
-
-import com.example.taskapp.network.model.Fault;
 import com.example.taskapp.network.model.Response;
 import com.example.taskapp.network.model.RestClient;
-import com.example.taskapp.network.model.Results;
 import com.example.taskapp.network.MostPopularApi;
 import com.example.taskapp.utilities.Constant;
-import com.google.gson.GsonBuilder;
 
-import java.util.List;
-
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
 
 public class ArticlesInteractorImpl implements ArticlesInteractor {
 
-    OnFinishedListener listener;
 
+    private Scheduler subscribeOn;
+    private Scheduler observableOn;
+    private MostPopularApi mostPopularApi;
 
-    @Override
-    public void getMostPopular(final OnFinishedListener listener) {
+    ArticlesInteractorImpl(){
 
-        this.listener=listener;
 
         //i initialize here as i just will use it one time
         RestClient restClient = new RestClient();
-        MostPopularApi mostPopularApi = restClient.getApiService();
+        mostPopularApi = restClient.getApiService();
+
+        this.subscribeOn = Schedulers.io();
+        this.observableOn = AndroidSchedulers.mainThread();
+    }
+
+    // non public constructor for Unit testing :
+    ArticlesInteractorImpl(MostPopularApi api, Scheduler testScheduler) {
+        this.mostPopularApi = api;
+        this.subscribeOn = testScheduler;
+        this.observableOn = testScheduler;
+    }
+
+    @Override
+    public Observable<Response> getMostPopular(String key) {
 
 
+        // Use RxJava If Want
+
+
+        return mostPopularApi.getMostPopularArticle(key)
+                .subscribeOn(this.subscribeOn)
+                .observeOn(observableOn);
+
+
+        /*
         //Using Call Back Function
         Call<Response> connection = mostPopularApi.getMostPopular(Constant.API_KEY);
         connection.enqueue(new Callback<Response>() {
@@ -61,29 +77,6 @@ public class ArticlesInteractorImpl implements ArticlesInteractor {
             }
         });
 
-
-
-
-        // Use RxJava If Want
-
-        /*
-        mostPopularApi.getMostPopularArticle(Constant.API_KEY)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::onSuccess, this::onError);
-
          */
-
     }
-
-
-    private void onError(Throwable throwable) {
-        listener.onError(throwable.getMessage());
-    }
-
-    private void onSuccess(Response response) {
-        listener.onFinished(response.getResults());
-    }
-
-
 }
